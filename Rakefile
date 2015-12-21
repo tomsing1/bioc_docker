@@ -30,8 +30,8 @@ def setup_docker
         puts "setting docker url"
         Docker.url = ENV['DOCKER_HOST']
     end
-    auth = YAML.load_file('auth.yml')
-    Docker.authenticate!(auth)    
+#    auth = YAML.load_file('auth.yml')
+#    Docker.authenticate!(auth)    
     @docker_setup = true
 end
 
@@ -88,36 +88,36 @@ for version_name in CONFIG['versions'].keys
               image.tag("repo" => "bioconductor/" + t.name, "tag" => tag, "force" => true)
           end
           puts "image tags are: #{image.info['RepoTags'].join(", ")}"
-          puts "pushing #{t.name}..."
-          # see if this fixes pushing issues:
-          # image_to_push = images.find{|i| i.info['RepoTags'].include? "bioconductor/#{t.name}:latest"}
-          # image_to_push.push()
-          # use docker executable instead of api
-          # because api pushes seem flaky
-
-          cmd = "docker push bioconductor/#{t.name}"
-          Open3.popen2e(cmd) do |stdin, stdout_err, wait_thr|
-              while line = stdout_err.gets
-                  puts line
-              end
-
-              exit_status = wait_thr.value
-              unless exit_status.success?
-                  abort "FAILED !!! '#{cmd}' returned exit code #{exit_status.exitstatus}"
-              end
-          end
-          puts "push done!"
-          # confirm that image in repo is properly tagged
-          output = `docker run --rm rufus/docker-registry-debug -q info bioconductor/#{t.name}`
-          lines = output.split("\n")
-          found_tags = []
-          puts "inspecting tags in image on hub..."
-          for line in lines
-              next if line.start_with? '-'
-              tag = line.strip.split(" ").first
-              puts "found tag #{tag}..."
-              found_tags << tag
-          end
+#          puts "pushing #{t.name}..."
+#          # see if this fixes pushing issues:
+#          # image_to_push = images.find{|i| i.info['RepoTags'].include? "bioconductor/#{t.name}:latest"}
+#          # image_to_push.push()
+#          # use docker executable instead of api
+#          # because api pushes seem flaky
+#
+#          cmd = "docker push bioconductor/#{t.name}"
+#          Open3.popen2e(cmd) do |stdin, stdout_err, wait_thr|
+#              while line = stdout_err.gets
+#                  puts line
+#              end
+#
+#              exit_status = wait_thr.value
+#              unless exit_status.success?
+#                  abort "FAILED !!! '#{cmd}' returned exit code #{exit_status.exitstatus}"
+#              end
+#          end
+#          puts "push done!"
+#          # confirm that image in repo is properly tagged
+#          output = `docker run --rm rufus/docker-registry-debug -q info bioconductor/#{t.name}`
+#          lines = output.split("\n")
+#          found_tags = []
+#          puts "inspecting tags in image on hub..."
+#          for line in lines
+#              next if line.start_with? '-'
+#              tag = line.strip.split(" ").first
+#              puts "found tag #{tag}..."
+#              found_tags << tag
+#          end
           # if wanted_tags.sort == found_tags.sort
           #     puts "tags matched!"
           # else
